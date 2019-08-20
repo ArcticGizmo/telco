@@ -17,11 +17,11 @@ defmodule Telco.Broadcaster do
     Phoenix.PubSub.broadcast(server, topic, {broadcast_id, message})
   end
 
-  defp broadcast_to_string(broadcast_id) when is_binary(broadcast_id) do
+  def broadcast_to_string(broadcast_id) when is_binary(broadcast_id) do
     broadcast_id
   end
 
-  defp broadcast_to_string(broadcast_id) when is_tuple(broadcast_id) do
+  def broadcast_to_string(broadcast_id) when is_tuple(broadcast_id) do
     broadcast_id
     |> Tuple.to_list()
     |> Enum.join(":")

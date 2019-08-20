@@ -6,8 +6,8 @@ defmodule Telco do
     Application.get_env(:telco, :tower, :telco_tower)
   end
 
-  def broadcast(server \\ tower_name(), broadcast_id, payload) do
-    Broadcaster.broadcast(server, broadcast_id, payload)
+  def broadcast(server \\ tower_name(), broadcast_id, message) do
+    Broadcaster.broadcast(server, broadcast_id, message)
   end
 
 
