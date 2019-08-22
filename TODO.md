@@ -8,3 +8,5 @@
 
 * broadcast_id is a rubbish term and should be expanded more into an radio name
 * telco might want to be renamed into something more radio based
+
+* finish writing the documentation for the example task
