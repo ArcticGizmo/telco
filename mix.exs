@@ -20,7 +20,7 @@ defmodule Telco.MixProject do
   def application do
     [
       mod: {Telco.Application, []},
-      extra_applications: [:logger]
+      extra_applications: [:logger],
     ]
   end
 
@@ -34,7 +34,6 @@ defmodule Telco.MixProject do
   defp deps do
     [
       {:phoenix_pubsub, "~> 1.0"},
-      {:liaison, "~> 0.1.0", only: [:dev]}
     ]
   end
 end

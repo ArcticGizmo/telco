@@ -29,7 +29,7 @@ defmodule Telco.Example do
   end
 
   def handle_call({:broadcast, broadcast_id, message}, _from, state) do
-    Logger.info("broadcasting", "on: `#{broadcast_id}` => #{inspect(message)}")
+    Logger.info("broadcaster", "on: `#{broadcast_id}` => `#{inspect(message)}`")
     resp = Broadcaster.broadcast(broadcast_id, message)
 
     messages = add_message(state.sent, message, resp)
@@ -39,7 +39,7 @@ defmodule Telco.Example do
   end
 
   def handle_info({broadcast_id, message}, state) do
-    Logger.info("received", "on: `#{broadcast_id}` => #{inspect(message)}")
+    Logger.info("listener", "on: `#{broadcast_id}` => `#{inspect(message)}`")
     messages = add_message(state.received, {broadcast_id, message})
     new_state = Map.put(state, :received, messages)
 

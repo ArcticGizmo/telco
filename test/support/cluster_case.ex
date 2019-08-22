@@ -37,6 +37,9 @@ defmodule Telco.Support.ClusterCase do
     # disable logging
     :ok = rpc(node, Logger, :configure, [[level: :warn]])
 
+    # start example application
+    {:ok, _pid} = rpc(node, Telco.Application, :start_example, [])
+
     {:ok ,{node, pid}}
   end
 
