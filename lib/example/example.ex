@@ -36,11 +36,21 @@ defmodule Telco.Example do
     {:reply, resp, state}
   end
 
+  def handle_call({:unsubscribe, topic}, _from, state) do
+    resp = Telco.unsubscribe(topic)
+    case resp do
+      :ok -> Logger.info("unsub", "#{topic} | :ok")
+      {:error, reason} -> Logger.error("unsub", "#{topic} | error: #{inspect(reason)}")
+    end
+
+    {:reply, resp, state}
+  end
+
   def handle_call({:broadcast, topic, message}, _from, state) do
     resp = Telco.broadcast(topic, message)
 
     case resp do
-      :ok -> Logger.info("out", "#{topic} | sent: #{inspect(message)}")
+      :ok -> Logger.info("out", "#{topic} | #{inspect(message)}")
       {:error, reason} -> Logger.info("out", "#{topic} | error: #{inspect(reason)}")
     end
 
@@ -51,7 +61,7 @@ defmodule Telco.Example do
   end
 
   def handle_info({topic, message}, state) do
-    Logger.info("in", "#{topic} | got: #{inspect(message)}")
+    Logger.info("in", "#{topic} | #{inspect(message)}")
     messages = add_message(state.received, {topic, message})
     new_state = Map.put(state, :received, messages)
 
@@ -81,6 +91,11 @@ defmodule Telco.Example do
   @spec subscribe(topic) :: :ok | {:error, :no_station | term}
   def subscribe(topic) do
     GenServer.call(__MODULE__, {:subscribe, topic})
+  end
+
+  @spec unsubscribe(topic) :: :ok | {:error, :no_station | term}
+  def unsubscribe(topic) do
+    GenServer.call(__MODULE__, {:unsubscribe, topic})
   end
 
   @spec broadcast(topic, message) :: :ok | {:error, :no_station | term}

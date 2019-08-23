@@ -75,6 +75,14 @@ defmodule Mix.Tasks.Telco.Example do
 
     Once the message has bene sent, the recieving node will get
       `[telco:in] station | "hello"`
+
+    Unsubscribing
+    ===========
+    To stop listening to a particular topic
+    > Telco.Example.unsubscribe("station")
+
+    When unsubscribed
+      `[telco:unsub] station | :ok
     """
 
     case id do

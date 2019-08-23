@@ -34,6 +34,13 @@ defmodule Telco do
     |> List.to_tuple()
   end
 
+  defp handle_errors(responses) do
+    case responses do
+      [] -> :ok
+      errors -> {:error, Enum.map(errors, &elem(&1, 1))}
+    end
+  end
+
   # --------------------------- broadcasting ---------------------
   @doc """
   The same as broadcast/3 where the stations is the first configured station
@@ -73,10 +80,7 @@ defmodule Telco do
     stations
     |> Enum.map(&broadcast(&1, topic, message))
     |> Enum.reject(&(&1 == :ok))
-    |> case do
-      [] -> :ok
-      errors -> {:error, Enum.map(errors, &elem(&1, 1))}
-    end
+    |> handle_errors()
   end
 
   # ---------------------------- subscribing -------------------------
@@ -105,9 +109,35 @@ defmodule Telco do
     stations
     |> Enum.map(&subscribe(&1, topic))
     |> Enum.reject(&(&1 == :ok))
-    |> case do
-      [] -> :ok
-      errors -> {:error, Enum.map(errors, &elem(&1, 1))}
-    end
+    |> handle_errors()
+  end
+
+  # ------------------------ unsubscribing ------------
+  @spec unsubscribe(topic) :: :ok | {:error, :no_station | term}
+  def unsubscribe(topic) do
+    unsubscribe(Telco.station(), topic)
+  end
+
+  @spec unsubscribe(station, topic) :: :ok | {:error, :no_station | term}
+  def unsubscribe(nil, _topic), do: {:error, :no_station}
+
+  def unsubscribe(station, topic) do
+    topic_str = topic_as_string(topic)
+    PubSub.unsubscribe(station, topic_str)
+  end
+
+  @spec unsubscribe_all(topic) :: :ok | {:error, :no_station | list(term)}
+  def unsubscribe_all(topic) do
+    unsubscribe_all(Telco.stations(), topic)
+  end
+
+  @spec unsubscribe_all(station, topic) :: :ok | {:error, :no_station | list(term)}
+  def unsubscribe_all(nil, _topic), do: {:error, :no_station}
+
+  def unsubscribe_all(stations, topic) do
+    stations
+    |> Enum.map(&unsubscribe(&1, topic))
+    |> Enum.reject(&(&1 == :ok))
+    |> handle_errors()
   end
 end
