@@ -56,12 +56,16 @@ defmodule Telco.Support.ClusterCase do
   end
 
   # ----------------------- helpers ---------------
-  def subscribe(node, broadcast_id) do
-    rpc(node, Example, :subscribe, [broadcast_id])
+  def subscribe(node, topic) do
+    rpc(node, Example, :subscribe, [topic])
   end
 
-  def broadcast(node, broadcast_id, message) do
-    rpc(node, Example, :broadcast, [broadcast_id, message])
+  def unsubscribe(node, topic) do
+    rpc(node, Example, :unsubscribe, [topic])
+  end
+
+  def broadcast(node, topic, message) do
+    rpc(node, Example, :broadcast, [topic, message])
   end
 
   def get_messages(node) do

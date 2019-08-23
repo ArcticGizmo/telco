@@ -13,31 +13,31 @@ defmodule Telco.Test do
   end
 
   test "Message on subscribed broadcast 'test_link", %{nodes: [{n1, _pid1}, {n2, _pid2}]} do
-    broadcast_id = "test_link"
+    topic = "test_link"
     message = "test message"
 
     # subscribe on node1
-    ClusterCase.subscribe(n1, broadcast_id)
+    ClusterCase.subscribe(n1, topic)
 
     # send a message from node 2
-    ClusterCase.broadcast(n2, broadcast_id, message)
+    ClusterCase.broadcast(n2, topic, message)
 
     # check that it was sent by node 2
     {[{_status, sent_msg}], _received} = ClusterCase.get_messages(n2)
     assert(sent_msg == message)
 
     # check that is was received by node 1
-    {_sent, [{topic, received_msg}]} = ClusterCase.get_messages(n1)
+    {_sent, [{back_topic, received_msg}]} = ClusterCase.get_messages(n1)
     assert(received_msg == message)
-    assert(topic == broadcast_id)
+    assert(back_topic == topic)
   end
 
   test "Message when not subscribed", %{nodes: [{n1, _pid1}, {n2, _pid2}]} do
-    broadcast_id = "test_unlinked"
+    topic = "test_unlinked"
     message = "connected"
 
     # broadcast
-    ClusterCase.broadcast(n2, broadcast_id, message)
+    ClusterCase.broadcast(n2, topic, message)
 
     # check that the message was sent
     {[{_status, sent_msg}], _received} = ClusterCase.get_messages(n2)
@@ -48,8 +48,24 @@ defmodule Telco.Test do
     assert(received == [], "Node1 should not have recieved a message")
   end
 
-  test "Can both send and received" do
+  test "Can both send and received", %{nodes: [{n1, _pid1}, {_n2, _pid2}]} do
+    topic = "myself"
+    message = "hello me"
 
+    # subscribe on node1
+    ClusterCase.subscribe(n1, topic)
+
+    # send a message from node1
+    ClusterCase.broadcast(n1, topic, message)
+
+    # check that it was sent by node 1
+    {[{_status, sent_msg}], _received} = ClusterCase.get_messages(n1)
+    assert(sent_msg == message)
+
+    # check that is was received by node 1
+    {_sent, [{back_topic, received_msg}]} = ClusterCase.get_messages(n1)
+    assert(received_msg == message)
+    assert(back_topic == topic)
   end
 
   test "Can send over multiple towers" do
