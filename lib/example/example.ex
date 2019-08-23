@@ -1,10 +1,13 @@
 defmodule Telco.Example do
   use GenServer
 
-  alias Telco.Broadcaster
-  alias Telco.Listener
+  @type station :: atom()
+  @type topic :: tuple() | String.t()
+  @type message :: any()
+
   alias Telco.Logger
 
+  @spec start_link(any) :: :ignore | {:error, any} | {:ok, pid}
   def start_link(_args) do
     state = %{
       sent: [],
@@ -14,8 +17,8 @@ defmodule Telco.Example do
     GenServer.start_link(__MODULE__, state, name: __MODULE__)
   end
 
+  @spec init(any) :: {:ok, any}
   def init(state) do
-    # Telco.Listener.subscribe_all(["apple", "banana"])
     {:ok, state}
   end
 
@@ -23,14 +26,23 @@ defmodule Telco.Example do
     {:reply, {state.sent, state.received}, state}
   end
 
-  def handle_call({:subscribe, broadcast_id}, _from, state) do
-    resp = Listener.subscribe(broadcast_id)
+  def handle_call({:subscribe, topic}, _from, state) do
+    resp = Telco.subscribe(topic)
+    case resp do
+      :ok -> Logger.info("sub", "#{topic} | :ok")
+      {:error, reason} -> Logger.error("sub", "#{topic} | error: #{inspect(reason)}")
+    end
+
     {:reply, resp, state}
   end
 
-  def handle_call({:broadcast, broadcast_id, message}, _from, state) do
-    Logger.info("broadcaster", "on: `#{broadcast_id}` => `#{inspect(message)}`")
-    resp = Broadcaster.broadcast(broadcast_id, message)
+  def handle_call({:broadcast, topic, message}, _from, state) do
+    resp = Telco.broadcast(topic, message)
+
+    case resp do
+      :ok -> Logger.info("out", "#{topic} | sent: #{inspect(message)}")
+      {:error, reason} -> Logger.info("out", "#{topic} | error: #{inspect(reason)}")
+    end
 
     messages = add_message(state.sent, message, resp)
     new_state = Map.put(state, :sent, messages)
@@ -38,9 +50,9 @@ defmodule Telco.Example do
     {:reply, resp, new_state}
   end
 
-  def handle_info({broadcast_id, message}, state) do
-    Logger.info("listener", "on: `#{broadcast_id}` => `#{inspect(message)}`")
-    messages = add_message(state.received, {broadcast_id, message})
+  def handle_info({topic, message}, state) do
+    Logger.info("in", "#{topic} | got: #{inspect(message)}")
+    messages = add_message(state.received, {topic, message})
     new_state = Map.put(state, :received, messages)
 
     {:noreply, new_state}
@@ -66,11 +78,13 @@ defmodule Telco.Example do
     GenServer.call(__MODULE__, :get_messages)
   end
 
-  def subscribe(broadcast_id) do
-    GenServer.call(__MODULE__, {:subscribe, broadcast_id})
+  @spec subscribe(topic) :: :ok | {:error, :no_station | term}
+  def subscribe(topic) do
+    GenServer.call(__MODULE__, {:subscribe, topic})
   end
 
-  def broadcast(broadcast_id, message) do
-    GenServer.call(__MODULE__, {:broadcast, broadcast_id, message})
+  @spec broadcast(topic, message) :: :ok | {:error, :no_station | term}
+  def broadcast(topic, message) do
+    GenServer.call(__MODULE__, {:broadcast, topic, message})
   end
 end

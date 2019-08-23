@@ -79,31 +79,31 @@ defmodule Telco do
     end
   end
 
-  # ---------------------------- listening -------------------------
-  @spec listen(topic) :: :ok | {:error, term}
-  def listen(topic) do
-    listen(Telco.station(), topic)
+  # ---------------------------- subscribing -------------------------
+  @spec subscribe(topic) :: :ok | {:error, term}
+  def subscribe(topic) do
+    subscribe(Telco.station(), topic)
   end
 
-  @spec listen(station, topic) :: :ok | {:error, any}
-  def listen(nil, _topic), do: {:error, :no_station}
+  @spec subscribe(station, topic) :: :ok | {:error, any}
+  def subscribe(nil, _topic), do: {:error, :no_station}
 
-  def listen(station, topic) do
+  def subscribe(station, topic) do
     topic_str = topic_as_string(topic)
     PubSub.subscribe(station, topic_str)
   end
 
-  @spec listen_all(topic) :: :ok | {:error, :no_station | list(term)}
-  def listen_all(topic) do
-    listen(Telco.stations(), topic)
+  @spec subscribe_all(topic) :: :ok | {:error, :no_station | list(term)}
+  def subscribe_all(topic) do
+    subscribe(Telco.stations(), topic)
   end
 
-  @spec listen_all(any, any) :: :ok | {:error, :no_station | list(term)}
-  def listen_all(nil, _topic), do: {:error, :no_station}
+  @spec subscribe_all(any, any) :: :ok | {:error, :no_station | list(term)}
+  def subscribe_all(nil, _topic), do: {:error, :no_station}
 
-  def listen_all(stations, topic) do
+  def subscribe_all(stations, topic) do
     stations
-    |> Enum.map(&listen(&1, topic))
+    |> Enum.map(&subscribe(&1, topic))
     |> Enum.reject(&(&1 == :ok))
     |> case do
       [] -> :ok

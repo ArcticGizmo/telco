@@ -4,7 +4,7 @@ defmodule Mix.Tasks.Telco.Example do
     and as a listener
   """
 
-  @start_cmd "iex --sname {name} -S mix telcoa.example"
+  @start_cmd "iex --sname {name} -S mix telco.example"
 
   @not_connected """
   The appliccation was started without being connected as a node.
@@ -63,7 +63,7 @@ defmodule Mix.Tasks.Telco.Example do
     > Telco.Example.subscribe("station")
 
     One subscription you will see
-      `[telco:listener] subscribed to 'station'`
+      `[telco:sub] station | :ok`
 
     Broadcast
     ==========
@@ -71,10 +71,10 @@ defmodule Mix.Tasks.Telco.Example do
     > Telco.Example.broadcast("station", "hello")
 
     The sending node will see
-      `[telco:broadcaster] on: 'station' => 'hello'`
+      `[telco:out] station | "hello"`
 
     Once the message has bene sent, the recieving node will get
-      `[telco:listener] on: 'station' => 'hello'`
+      `[telco:in] station | "hello"`
     """
 
     case id do
