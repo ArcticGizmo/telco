@@ -10,3 +10,9 @@
 * telco might want to be renamed into something more radio based
 
 * finish writing the documentation for the example task
+
+* add a beacon feature that constantly outputs data at the specified rate
+    (this may want to me separated out into a different application `Telco.Beacon`)
+
+* add in direct messaging
+    `Telco.Direct`

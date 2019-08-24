@@ -9,7 +9,7 @@ defmodule Telco.Application do
   @spec start(any, any) :: {:error, any} | {:ok, pid}
   def start(_type, _args) do
     children = [
-      {Phoenix.PubSub.PG2, name: Telco.tower_name()},
+      {Phoenix.PubSub.PG2, name: Telco.station()},
     ]
 
     opts = [strategy: :one_for_one, name: TrackPub.PubSub.Supervisor]

@@ -16,7 +16,6 @@ defmodule Telco.MixProject do
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_mode), do: ["lib"]
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
     [
       mod: {Telco.Application, []},
@@ -30,7 +29,6 @@ defmodule Telco.MixProject do
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
       {:phoenix_pubsub, "~> 1.0"},
